@@ -9,7 +9,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Instalar dependências leves (testes não usam torch/tensorflow)
-        run: pip install pandas numpy scikit-learn pytest ruff
+        run: pip install pandas numpy scikit-learn matplotlib pytest ruff
       - name: Lint
         run: ruff check .
       - name: Testes
