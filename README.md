@@ -89,8 +89,39 @@ modelos (70/15/15, semente 42). Base: 10 especialidades x 2.000 perguntas.
   piores Psicólogo (0,71), Psiquiatra (0,74) e Neurologista (0,77).
 - Resultados de uma única execução (uma semente), sem intervalo de confiança; o grid testou
   poucos valores e o melhor ficou na borda (5e-5), então há espaço para ajuste.
-- _Preencher: 5 a 10 erros típicos e hipóteses (saída da análise de erros), por exemplo
-  confusões entre Psicólogo e Psiquiatra._
+
+### Análise de erros
+O BERTimbau errou 464 das 3.000 perguntas de teste (15,5%). As 12 confusões mais comuns
+somam 240 erros (52% do total):
+
+| Real → previsto | Erros |
+|---|---|
+| Psicólogo → Psiquiatra | 61 |
+| Psiquiatra → Psicólogo | 48 |
+| Urologista → Ginecologista | 22 |
+| Neurologista → Psicólogo | 20 |
+| Ginecologista → Urologista | 16 |
+| Psiquiatra → Neurologista | 14 |
+| Neurologista → Dermatologista | 11 |
+| Neurologista → Otorrino | 10 |
+| Psicólogo → Neurologista | 10 |
+| Otorrino → Neurologista | 10 |
+| Dentista → Otorrino | 9 |
+| Neurologista → Dentista | 9 |
+
+Padrões observados (as explicações abaixo são hipóteses, não foram testadas):
+- **Psicólogo × Psiquiatra** (109 erros, 23% do total, nos dois sentidos): os temas se
+  sobrepõem (ansiedade, depressão, antidepressivos). Ex.: uma pergunta sobre depressão pós-parto
+  com antidepressivos, respondida por psicólogo, foi prevista como psiquiatra.
+- **Urologista × Ginecologista** (38 erros): perguntas de saúde sexual e infecções genitais
+  servem às duas especialidades.
+- **Neurologista** aparece em 84 erros (18%), confundido com psicólogo, psiquiatra, otorrino,
+  dermatologista e dentista, pois sintomas como dor, tontura e formigamento são comuns a várias áreas.
+- **Rótulo = quem respondeu, não o assunto.** Algumas perguntas poderiam ser legitimamente
+  respondidas por outra especialidade (ex.: dúvida sobre suplemento para distrofia muscular,
+  respondida por neurologista e prevista como ortopedista), então parte dos "erros" é ambiguidade do rótulo.
+- **Textos curtos erram um pouco mais:** tamanho médio de 157 caracteres nos erros contra
+  171 nos acertos, diferença pequena.
 
 ## Licença
 O código deste repositório está sob a licença [MIT](LICENSE). A licença do código **não se
@@ -102,5 +133,13 @@ que mantêm as licenças de seus autores.
 - Ajuste de hiperparâmetros (taxa de aprendizado, com lote 16) por busca em grade,
   escolhendo pelo F1 macro de **validação**; o teste só é usado uma vez, no modelo final.
 - Pesos por classe na loss; melhor checkpoint escolhido na validação, nunca no teste.
-- _Preencher: limitações do dataset (origem em plataforma de consultas online, rótulos
-  sintéticos, viés), e riscos de uso em contexto real de saúde._
+- **Rótulo indireto:** o alvo é a especialidade de quem respondeu, não um diagnóstico nem a
+  especialidade "correta" para a pergunta. Isso limita o teto de desempenho (ver análise de erros).
+- **Subconjunto:** 10 especialidades de rótulo único, 2.000 perguntas por classe, para caber em
+  GPU gratuita. Os resultados não se estendem ao dataset completo nem a outras especialidades.
+- **Origem dos dados:** perguntas de pacientes em plataforma online, com linguagem informal,
+  erros de digitação e possível viés de quem usa esse tipo de serviço.
+- **Avaliação:** uma única execução (uma semente), sem intervalo de confiança; a diferença de
+  cerca de 6 pontos sobre os baselines é consistente, mas diferenças menores não seriam conclusivas.
+- **Risco em saúde:** o modelo não é validado clinicamente e não deve ser usado para triagem
+  ou para orientar pacientes. Uso restrito a estudo e portfólio.
