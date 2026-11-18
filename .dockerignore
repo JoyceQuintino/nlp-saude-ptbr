@@ -1,0 +1,8 @@
+.venv
+.git
+data/raw
+mlruns
+reports
+resultados
+resultados.zip
+__pycache__

@@ -75,6 +75,23 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" \
 
 docker build -t nlp-saude . && docker run -p 8000:8000 nlp-saude
 ```
+Exemplo de resposta (executado localmente; probabilidades arredondadas e abreviadas):
+```json
+{
+  "label": "Neurologista",
+  "score": 0.989,
+  "probabilities": {
+    "Neurologista": 0.989,
+    "Otorrino": 0.003,
+    "Psicólogo": 0.003,
+    "Psiquiatra": 0.002,
+    "...": "demais classes < 0,002"
+  }
+}
+```
+Documentação interativa (Swagger) em `http://localhost:8000/docs`. O endpoint `/health`
+retorna `{"status": "ok"}`. No Windows, prefira o Swagger ao `curl`.
+
 O modelo treinado não é versionado no Git (`models/` está no `.gitignore`): o `docker build`
 funciona localmente depois do treino. Para deploy público, publique o modelo no Hugging Face Hub.
 
